@@ -1,9 +1,9 @@
 import React from 'react'
 import Button from './Button'
-
-const OperationButton = ({operation, className}) => {
+import { ACTIONS } from '../App'
+const OperationButton = ({operation, className, dispatch}) => {
   return (
-    <Button className={className} value={operation}/>
+    <Button className={className} onClick={() => dispatch({type: ACTIONS.OPERATION, payload: {operation}})} value={operation}/>
   )
 }
 

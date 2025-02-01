@@ -1,6 +1,6 @@
 import React from "react";
 
-const Button = ({ value, className = "" }) => {
+const Button = ({ value, className = "", onClick }) => {
     return (
         <button
             className={`rounded-2xl text-white font-semibold text-xl 
@@ -8,6 +8,7 @@ const Button = ({ value, className = "" }) => {
                 active:shadow-none active:scale-95 active:translate-y-1 cursor-pointer
                 transition duration-50 ease-in-out 
                 ${className}`}
+            onClick={onClick}
         >
             {value}
         </button>
