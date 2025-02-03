@@ -1,4 +1,4 @@
-import { useReducer } from "react"
+import { useEffect, useReducer, useState } from "react"
 import Button from "./components/Button"
 import DigitButton from "./components/DigitButton"
 import OperationButton from "./components/OperationButton"
@@ -49,9 +49,13 @@ const reducer = (state, {type, payload}) => {
           rhs: true
         }
       }
-      return {
-        ...state,
-        currentOperand: `${state.currentOperand || ""}${payload.digit}`
+      if(state.currentOperand != null && state.currentOperand.length > 16){
+        return state
+      } else {
+        return {
+          ...state,
+          currentOperand: `${state.currentOperand || ""}${payload.digit}`
+        }
       }
       break;
     case ACTIONS.OPERATION:
@@ -127,7 +131,17 @@ const reducer = (state, {type, payload}) => {
   }
 }
 
+const INTEGER_FORMATTER = new Intl.NumberFormat('en-us')
+
+function formatOperand(operand){
+  if (operand == null || operand == "") return
+  const [integer, decimal] = operand.split(".")
+  if (decimal == null) return INTEGER_FORMATTER.format(integer)
+  return `${INTEGER_FORMATTER.format(integer)}.${decimal}`
+}
+
 function App() {
+  const [fontSize, setFontSize] = useState(6)
   const initialState = {
     currentOperand: null,
     previousOperand: null,
@@ -135,12 +149,19 @@ function App() {
     rhs: false, // Set initial value properly
   };
   const [{currentOperand, previousOperand, operation, rhs}, dispatch] = useReducer(reducer, initialState)
+  useEffect(()=>{
+    if (currentOperand?.length > 9){
+      setFontSize(3)
+    } else {
+      setFontSize(6)
+    }
+  }, [currentOperand])  
   return (
     <>
       <div className="main flex flex-col bg-[#384253] h-[60%] w-[23%] rounded-4xl">
         <div className="screen flex flex-col justify-center gap-1.5 items-end px-6 min-h-1/4 max-h-auto">
-          <div className="main-screen text-white w-full text-end break-words text-6xl">{currentOperand}</div>
-          <div className="secondary-screen text-[#ffffffbf] text-sm w-full text-end break-words">{previousOperand}{operation}</div>
+          <div className={`main-screen text-white w-full text-end break-words text-${fontSize}xl`}>{formatOperand(currentOperand)}</div>
+          <div className="secondary-screen text-[#ffffffbf] text-sm w-full text-end break-words">{formatOperand(previousOperand)}{operation}</div>
         </div>
         <div className="keypad h-[70%] grid grid-cols-4 grid-rows-5 gap-6 px-6">
           <Button onClick={() => dispatch({type: ACTIONS.ALL_CLEAR})} className="col-span-2 bg-[#252b36]" value={"AC"}/>
